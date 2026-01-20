@@ -3,21 +3,21 @@ import { Store } from '../data/store';
 import { BookRecord, PersonRecord } from '../domain/models';
 import { seedData } from '../data/seed';
 import { LibraryService } from '../services/libraryService';
-import { Logger, createLogger } from '../utils/logger';
+import * as winston from 'winston';
+import { createLogger } from '../utils/logger';
 
 /**
- * GraphQL context interface containing stores, services, and logger
+ * GraphQL context object containing stores, services, and logger
  */
 export interface GraphQLContext {
   bookStore: Store<BookRecord>;
   personStore: Store<PersonRecord>;
   libraryService: LibraryService;
-  logger: Logger;
+  logger: winston.Logger;
 }
 
 /**
- * Creates and initializes GraphQL context with stores, seeded data, and services
- * @returns GraphQL context object for use in resolvers
+ * Creates and initializes the GraphQL context with stores and services
  */
 export function createContext(): GraphQLContext {
   const logger = createLogger();

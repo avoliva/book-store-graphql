@@ -1,15 +1,8 @@
 /**
- * Interface for entities that have an ID property
- */
-export interface Identifiable {
-  id: string;
-}
-
-/**
  * Generic store interface for data access abstraction
- * @template T - The type of record stored, must extend Identifiable
+ * @template T - The type of record stored, must have an id property
  */
-export interface Store<T extends Identifiable> {
+export interface Store<T extends { id: string }> {
   /**
    * Retrieves a single record by ID
    * @param id - The ID of the record to retrieve

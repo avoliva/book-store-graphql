@@ -1,43 +1,10 @@
 import * as winston from 'winston';
 
 /**
- * Logger interface providing consistent logging methods
- */
-export interface Logger {
-  /**
-   * Logs an informational message
-   * @param message - The message to log
-   * @param meta - Additional metadata to include
-   */
-  info(message: string, ...meta: unknown[]): void;
-
-  /**
-   * Logs a debug message
-   * @param message - The message to log
-   * @param meta - Additional metadata to include
-   */
-  debug(message: string, ...meta: unknown[]): void;
-
-  /**
-   * Logs a warning message
-   * @param message - The message to log
-   * @param meta - Additional metadata to include
-   */
-  warn(message: string, ...meta: unknown[]): void;
-
-  /**
-   * Logs an error message
-   * @param message - The message to log
-   * @param meta - Additional metadata to include
-   */
-  error(message: string, ...meta: unknown[]): void;
-}
-
-/**
  * Creates and configures a Winston logger instance
  * @returns Configured logger instance
  */
-export function createLogger(): Logger {
+export function createLogger(): winston.Logger {
   return winston.createLogger({
     level: process.env.LOG_LEVEL || 'info',
     format: winston.format.combine(

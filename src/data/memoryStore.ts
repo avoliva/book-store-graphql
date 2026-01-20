@@ -1,11 +1,10 @@
-import { Store, Identifiable } from './store';
+import { Store } from './store';
 
 /**
  * In-memory implementation of Store interface using Map
- * Provides O(1) lookup time for ID-based queries
- * @template T - The type of record stored, must extend Identifiable
+ * @template T - The type of record stored, must have an id property
  */
-export class MemoryStore<T extends Identifiable> implements Store<T> {
+export class MemoryStore<T extends { id: string }> implements Store<T> {
   private data: Map<string, T>;
 
   /**
@@ -40,7 +39,7 @@ export class MemoryStore<T extends Identifiable> implements Store<T> {
 
   /**
    * Creates a new record
-   * @param record - The record to create (must have id property per Identifiable constraint)
+   * @param record - The record to create (must have id property)
    * @returns The created record
    */
   create(record: T): T {

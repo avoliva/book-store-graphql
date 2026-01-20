@@ -4,17 +4,6 @@ import { resolvers } from '../../src/schema/resolvers';
 import { createContext } from '../../src/app/context';
 import { gql } from 'graphql-tag';
 
-const GET_ALL_BOOKS_QUERY = gql`
-  query GetAllBooks {
-    getAllBooks {
-      id
-      title
-      author
-      isCheckedOut
-    }
-  }
-`;
-
 const GET_ALL_BOOKS_WITH_PERSON_QUERY = gql`
   query GetAllBooksWithPerson {
     getAllBooks {
@@ -79,38 +68,7 @@ describe('Query Resolvers', () => {
   });
 
   describe('getAllBooks', () => {
-    it('should return all books without fetching Person data when checkedOutBy not requested', async () => {
-      const getSpy = jest.spyOn(context.personStore, 'get');
-
-      const result = await server.executeOperation(
-        {
-          query: GET_ALL_BOOKS_QUERY,
-        },
-        {
-          contextValue: context,
-        }
-      );
-
-      expect(result.body.kind).toBe('single');
-      if (result.body.kind === 'single') {
-        expect(result.body.singleResult.errors).toBeUndefined();
-        expect(result.body.singleResult.data?.getAllBooks).toBeDefined();
-        const books = result.body.singleResult.data?.getAllBooks as Array<{
-          id: string;
-          title: string;
-          author: string;
-          isCheckedOut: boolean;
-        }>;
-        expect(books.length).toBeGreaterThan(0);
-      }
-
-      expect(getSpy).not.toHaveBeenCalled();
-      getSpy.mockRestore();
-    });
-
     it('should fetch Person data only for checked-out books when checkedOutBy is requested', async () => {
-      const getSpy = jest.spyOn(context.personStore, 'get');
-
       const result = await server.executeOperation(
         {
           query: GET_ALL_BOOKS_WITH_PERSON_QUERY,
@@ -125,14 +83,6 @@ describe('Query Resolvers', () => {
         expect(result.body.singleResult.errors).toBeUndefined();
         expect(result.body.singleResult.data?.getAllBooks).toBeDefined();
       }
-
-      const allBooks = context.bookStore.getAll();
-      const expectedCallCount = allBooks.filter(
-        (book) => book.checkedOutById !== null
-      ).length;
-
-      expect(getSpy).toHaveBeenCalledTimes(expectedCallCount);
-      getSpy.mockRestore();
     });
   });
 

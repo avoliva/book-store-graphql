@@ -4,17 +4,9 @@ import { validateId } from '../../domain/validation';
 import { createValidationError } from '../../domain/errors';
 import { normalizeId } from '../../utils/normalization';
 
-/**
- * Resolvers for Mutation operations
- */
 export const Mutation = {
   /**
-   * Checks out a book to a person
-   * @param _parent - Unused (root mutation)
    * @param args - Mutation arguments containing bookId and personId
-   * @param context - GraphQL context containing libraryService
-   * @returns Updated book record
-   * @throws GraphQLError if validation fails, book not found, person not found, or book already checked out
    */
   checkOutBook(
     _parent: unknown,
@@ -41,7 +33,6 @@ export const Mutation = {
   },
 
   /**
-   * Returns a checked-out book
    * @param _parent - Unused (root mutation)
    * @param args - Mutation arguments containing bookId
    * @param context - GraphQL context containing libraryService

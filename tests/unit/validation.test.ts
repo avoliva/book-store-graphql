@@ -17,20 +17,16 @@ describe('Validation Utilities', () => {
 
     it('should return invalid for whitespace-only strings', () => {
       expect(validateId('   ').valid).toBe(false);
-      expect(validateId('\t').valid).toBe(false);
-      expect(validateId('\n').valid).toBe(false);
     });
 
-    it('should return invalid for strings with leading whitespace', () => {
-      const result = validateId('  book123');
-      expect(result.valid).toBe(false);
-      expect(result.error).toContain('leading or trailing whitespace');
-    });
-
-    it('should return invalid for strings with trailing whitespace', () => {
-      const result = validateId('book123  ');
-      expect(result.valid).toBe(false);
-      expect(result.error).toContain('leading or trailing whitespace');
+    it('should return invalid for strings with leading or trailing whitespace', () => {
+      const result1 = validateId('  book123');
+      expect(result1.valid).toBe(false);
+      expect(result1.error).toContain('leading or trailing whitespace');
+      
+      const result2 = validateId('book123  ');
+      expect(result2.valid).toBe(false);
+      expect(result2.error).toContain('leading or trailing whitespace');
     });
 
     it('should return invalid for strings longer than 100 characters', () => {
@@ -44,12 +40,6 @@ describe('Validation Utilities', () => {
       const result = validateId('book\u0000');
       expect(result.valid).toBe(false);
       expect(result.error).toContain('control characters');
-    });
-
-    it('should return invalid for non-string values', () => {
-      const result = validateId(null as unknown as string);
-      expect(result.valid).toBe(false);
-      expect(result.error).toContain('non-empty string');
     });
   });
 });

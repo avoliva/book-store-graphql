@@ -1,55 +1,25 @@
-/**
- * Validation result type
- */
 export interface ValidationResult {
   valid: boolean;
   error?: string;
 }
 
-/**
- * Validates ID format
- * @param id - The ID to validate
- * @returns ValidationResult with valid flag and optional error message
- */
 export function validateId(id: string): ValidationResult {
-  if (!id || typeof id !== 'string') {
-    return {
-      valid: false,
-      error: 'ID must be a non-empty string',
-    };
+  if (!id || typeof id !== 'string' || id.trim().length === 0) {
+    return { valid: false, error: 'ID must be a non-empty string' };
   }
 
-  const trimmed = id.trim();
-  if (trimmed.length === 0) {
-    return {
-      valid: false,
-      error: 'ID cannot be empty or whitespace-only',
-    };
-  }
-
-  if (trimmed.length !== id.length) {
-    return {
-      valid: false,
-      error: 'ID cannot contain leading or trailing whitespace',
-    };
+  if (id.trim() !== id) {
+    return { valid: false, error: 'ID cannot contain leading or trailing whitespace' };
   }
 
   if (id.length > 100) {
-    return {
-      valid: false,
-      error: `ID length must be between 1 and 100 characters, but got ${id.length}`,
-    };
+    return { valid: false, error: 'ID length must be between 1 and 100 characters' };
   }
 
-  // Check for control characters (except newline and tab which might be valid in some contexts)
-  // Control characters are characters with code points < 32, excluding space (32), newline (10), tab (9), carriage return (13)
   for (let i = 0; i < id.length; i++) {
     const charCode = id.charCodeAt(i);
     if (charCode < 32 && charCode !== 9 && charCode !== 10 && charCode !== 13) {
-      return {
-        valid: false,
-        error: 'ID cannot contain control characters',
-      };
+      return { valid: false, error: 'ID cannot contain control characters' };
     }
   }
 

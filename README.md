@@ -35,7 +35,7 @@ The code is organized into a few layers:
 - **Data layer** (`src/data/`) - In-memory store using a Map, seed data
 - **Services** (`src/services/`) - Business logic for checkout/return operations
 - **GraphQL layer** (`src/schema/`) - Schema definitions and resolvers
-- **Utilities** (`src/utils/`) - Logging, sanitization utilities
+- **Utilities** (`src/utils/`) - Logging, normalization utilities
 
 The key design decision is lazy loading. When you query `getAllBooks`, it doesn't fetch any person data. Only when you include `checkedOutBy` in your query does it look up the person. This is handled by a field resolver that only runs when that field is requested.
 
@@ -50,7 +50,6 @@ All user inputs are validated before processing:
 
 Validation errors return `GraphQLError` with error codes:
 - `VALIDATION_ERROR` - Validation error with specific error message from validation utilities
-- `INVALID_STRING_LENGTH` - String length outside allowed range
 
 #### Normalization Policy
 
@@ -264,7 +263,7 @@ mutation CheckOutWithEmptyId {
   }
 }
 ```
-**Expected Result:** Error with code `INVALID_ID_FORMAT`
+**Expected Result:** Error with code `VALIDATION_ERROR`
 
 Try querying with whitespace-only ID:
 ```graphql
@@ -275,7 +274,7 @@ query GetBookWithWhitespaceId {
   }
 }
 ```
-**Expected Result:** Error with code `INVALID_ID_FORMAT`
+**Expected Result:** Error with code `VALIDATION_ERROR`
 
 ## Logging
 

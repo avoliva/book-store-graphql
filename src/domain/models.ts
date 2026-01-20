@@ -1,6 +1,5 @@
 /**
  * BookRecord represents a book in the library system
- * Note: isCheckedOut is NOT stored here - it is computed from checkedOutById in the resolver
  */
 export interface BookRecord {
   id: string;
