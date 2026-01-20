@@ -10,6 +10,7 @@ export const Query = {
     _args: Record<string, never>,
     context: GraphQLContext
   ): BookRecord[] {
+    context.logger.debug('Query: getAllBooks');
     return context.bookStore.getAll();
   },
 
@@ -22,6 +23,7 @@ export const Query = {
     args: { bookId: string },
     context: GraphQLContext
   ): BookRecord {
+    context.logger.debug('Query: getBookForId', { bookId: args.bookId });
     const bookIdValidation = validateId(args.bookId);
     if (!bookIdValidation.valid) {
       throw createValidationError('bookId', bookIdValidation.error || 'Invalid ID format');

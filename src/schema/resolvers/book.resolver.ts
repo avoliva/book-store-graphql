@@ -24,6 +24,10 @@ export const Book = {
     if (!parent.checkedOutById) {
       return null;
     }
+    context.logger.debug(`Fetching person data for book ${parent.id}`, {
+      bookId: parent.id,
+      personId: parent.checkedOutById,
+    });
     return context.personStore.get(parent.checkedOutById) ?? null;
   },
 };

@@ -13,6 +13,7 @@ export const Mutation = {
     args: { bookId: string; personId: string },
     context: GraphQLContext
   ): BookRecord {
+    context.logger.debug('Mutation: checkOutBook', { bookId: args.bookId, personId: args.personId });
     // Validate bookId
     const bookIdValidation = validateId(args.bookId);
     if (!bookIdValidation.valid) {
@@ -44,6 +45,7 @@ export const Mutation = {
     args: { bookId: string },
     context: GraphQLContext
   ): BookRecord {
+    context.logger.debug('Mutation: returnBook', { bookId: args.bookId });
     // Validate bookId
     const bookIdValidation = validateId(args.bookId);
     if (!bookIdValidation.valid) {
