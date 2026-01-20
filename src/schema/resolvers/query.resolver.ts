@@ -1,5 +1,5 @@
 import { GraphQLContext } from '../../app/context';
-import { BookRecord } from '../../domain/models';
+import { BookRecord, PersonRecord } from '../../domain/models';
 import { createBookNotFoundError, createValidationError } from '../../domain/errors';
 import { validateId } from '../../domain/validation';
 import { normalizeId } from '../../utils/normalization';
@@ -37,4 +37,12 @@ export const Query = {
     }
     return book;
   },
+
+  getPersons(
+    _parent: unknown,
+    _args: Record<string, never>,
+    context: GraphQLContext
+  ): PersonRecord[] {
+    return context.personStore.getAll();
+  }
 };
