@@ -48,6 +48,24 @@ const GET_BOOK_BY_ID_QUERY = gql`
   }
 `;
 
+const GET_CHECKED_OUT_BOOK_WITH_PERSON_QUERY = gql`
+  query GetCheckedOutBookWithPerson($bookId: ID!) {
+    getBookForId(bookId: $bookId) {
+      id
+      title
+      author
+      isCheckedOut
+      checkedOutBy {
+        id
+        firstName
+        lastName
+        emailAddress
+        phoneNumber
+      }
+    }
+  }
+`;
+
 describe('Query Resolvers', () => {
   let server: ApolloServer<ReturnType<typeof createContext>>;
   let context: ReturnType<typeof createContext>;
@@ -143,6 +161,54 @@ describe('Query Resolvers', () => {
       }
     });
 
+    it('should return a checked-out book with Person name and contact information', async () => {
+      // Book ID '2' is checked out by Person ID '1' (John Doe) per seed data
+      const result = await server.executeOperation(
+        {
+          query: GET_CHECKED_OUT_BOOK_WITH_PERSON_QUERY,
+          variables: { bookId: '2' },
+        },
+        {
+          contextValue: context,
+        }
+      );
+
+      expect(result.body.kind).toBe('single');
+      if (result.body.kind === 'single') {
+        expect(result.body.singleResult.errors).toBeUndefined();
+        expect(result.body.singleResult.data?.getBookForId).toBeDefined();
+        
+        const book = result.body.singleResult.data?.getBookForId as {
+          id: string;
+          title: string;
+          author: string;
+          isCheckedOut: boolean;
+          checkedOutBy: {
+            id: string;
+            firstName: string;
+            lastName: string;
+            emailAddress: string;
+            phoneNumber: string | null;
+          } | null;
+        };
+
+        // Verify book is checked out
+        expect(book.id).toBe('2');
+        expect(book.isCheckedOut).toBe(true);
+        
+        // Verify Person data is present and correct
+        expect(book.checkedOutBy).not.toBeNull();
+        expect(book.checkedOutBy).toBeDefined();
+        if (book.checkedOutBy) {
+          expect(book.checkedOutBy.id).toBe('1');
+          expect(book.checkedOutBy.firstName).toBe('John');
+          expect(book.checkedOutBy.lastName).toBe('Doe');
+          expect(book.checkedOutBy.emailAddress).toBe('john.doe@example.com');
+          expect(book.checkedOutBy.phoneNumber).toBe('555-0101');
+        }
+      }
+    });
+
     it('should throw error for non-existent book', async () => {
       const result = await server.executeOperation(
         {
@@ -159,6 +225,66 @@ describe('Query Resolvers', () => {
         expect(result.body.singleResult.errors).toBeDefined();
         expect(result.body.singleResult.errors?.[0]?.extensions?.code).toBe('BOOK_NOT_FOUND');
       }
+    });
+  });
+
+  describe('Input Validation', () => {
+    describe('getBookForId', () => {
+      it('should throw validation error for empty bookId', async () => {
+        const result = await server.executeOperation(
+          {
+            query: GET_BOOK_BY_ID_QUERY,
+            variables: { bookId: '' },
+          },
+          {
+            contextValue: context,
+          }
+        );
+
+        expect(result.body.kind).toBe('single');
+        if (result.body.kind === 'single') {
+          expect(result.body.singleResult.errors).toBeDefined();
+          expect(result.body.singleResult.errors?.[0]?.extensions?.code).toBe('INVALID_ID_FORMAT');
+          expect(result.body.singleResult.errors?.[0]?.extensions?.field).toBe('bookId');
+        }
+      });
+
+      it('should throw validation error for whitespace-only bookId', async () => {
+        const result = await server.executeOperation(
+          {
+            query: GET_BOOK_BY_ID_QUERY,
+            variables: { bookId: '   ' },
+          },
+          {
+            contextValue: context,
+          }
+        );
+
+        expect(result.body.kind).toBe('single');
+        if (result.body.kind === 'single') {
+          expect(result.body.singleResult.errors).toBeDefined();
+          expect(result.body.singleResult.errors?.[0]?.extensions?.code).toBe('INVALID_ID_FORMAT');
+          expect(result.body.singleResult.errors?.[0]?.extensions?.field).toBe('bookId');
+        }
+      });
+
+      it('should throw validation error for bookId with leading whitespace', async () => {
+        const result = await server.executeOperation(
+          {
+            query: GET_BOOK_BY_ID_QUERY,
+            variables: { bookId: '  1' },
+          },
+          {
+            contextValue: context,
+          }
+        );
+
+        expect(result.body.kind).toBe('single');
+        if (result.body.kind === 'single') {
+          expect(result.body.singleResult.errors).toBeDefined();
+          expect(result.body.singleResult.errors?.[0]?.extensions?.code).toBe('INVALID_ID_FORMAT');
+        }
+      });
     });
   });
 });

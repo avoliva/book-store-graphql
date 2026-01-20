@@ -203,4 +203,142 @@ describe('Mutation Resolvers', () => {
       }
     });
   });
+
+  describe('Input Validation', () => {
+    describe('checkOutBook', () => {
+      it('should throw validation error for empty bookId', async () => {
+        const result = await server.executeOperation(
+          {
+            query: CHECKOUT_BOOK_MUTATION,
+            variables: { bookId: '', personId: '1' },
+          },
+          {
+            contextValue: context,
+          }
+        );
+
+        expect(result.body.kind).toBe('single');
+        if (result.body.kind === 'single') {
+          expect(result.body.singleResult.errors).toBeDefined();
+          expect(result.body.singleResult.errors?.[0]?.extensions?.code).toBe('INVALID_ID_FORMAT');
+          expect(result.body.singleResult.errors?.[0]?.extensions?.field).toBe('bookId');
+        }
+      });
+
+      it('should throw validation error for empty personId', async () => {
+        const result = await server.executeOperation(
+          {
+            query: CHECKOUT_BOOK_MUTATION,
+            variables: { bookId: '1', personId: '' },
+          },
+          {
+            contextValue: context,
+          }
+        );
+
+        expect(result.body.kind).toBe('single');
+        if (result.body.kind === 'single') {
+          expect(result.body.singleResult.errors).toBeDefined();
+          expect(result.body.singleResult.errors?.[0]?.extensions?.code).toBe('INVALID_ID_FORMAT');
+          expect(result.body.singleResult.errors?.[0]?.extensions?.field).toBe('personId');
+        }
+      });
+
+      it('should throw validation error for whitespace-only bookId', async () => {
+        const result = await server.executeOperation(
+          {
+            query: CHECKOUT_BOOK_MUTATION,
+            variables: { bookId: '   ', personId: '1' },
+          },
+          {
+            contextValue: context,
+          }
+        );
+
+        expect(result.body.kind).toBe('single');
+        if (result.body.kind === 'single') {
+          expect(result.body.singleResult.errors).toBeDefined();
+          expect(result.body.singleResult.errors?.[0]?.extensions?.code).toBe('INVALID_ID_FORMAT');
+          expect(result.body.singleResult.errors?.[0]?.extensions?.field).toBe('bookId');
+        }
+      });
+
+      it('should throw validation error for whitespace-only personId', async () => {
+        const result = await server.executeOperation(
+          {
+            query: CHECKOUT_BOOK_MUTATION,
+            variables: { bookId: '1', personId: '\t\n' },
+          },
+          {
+            contextValue: context,
+          }
+        );
+
+        expect(result.body.kind).toBe('single');
+        if (result.body.kind === 'single') {
+          expect(result.body.singleResult.errors).toBeDefined();
+          expect(result.body.singleResult.errors?.[0]?.extensions?.code).toBe('INVALID_ID_FORMAT');
+          expect(result.body.singleResult.errors?.[0]?.extensions?.field).toBe('personId');
+        }
+      });
+
+      it('should throw validation error for bookId with leading whitespace', async () => {
+        const result = await server.executeOperation(
+          {
+            query: CHECKOUT_BOOK_MUTATION,
+            variables: { bookId: '  1', personId: '1' },
+          },
+          {
+            contextValue: context,
+          }
+        );
+
+        expect(result.body.kind).toBe('single');
+        if (result.body.kind === 'single') {
+          expect(result.body.singleResult.errors).toBeDefined();
+          expect(result.body.singleResult.errors?.[0]?.extensions?.code).toBe('INVALID_ID_FORMAT');
+        }
+      });
+    });
+
+    describe('returnBook', () => {
+      it('should throw validation error for empty bookId', async () => {
+        const result = await server.executeOperation(
+          {
+            query: RETURN_BOOK_MUTATION,
+            variables: { bookId: '' },
+          },
+          {
+            contextValue: context,
+          }
+        );
+
+        expect(result.body.kind).toBe('single');
+        if (result.body.kind === 'single') {
+          expect(result.body.singleResult.errors).toBeDefined();
+          expect(result.body.singleResult.errors?.[0]?.extensions?.code).toBe('INVALID_ID_FORMAT');
+          expect(result.body.singleResult.errors?.[0]?.extensions?.field).toBe('bookId');
+        }
+      });
+
+      it('should throw validation error for whitespace-only bookId', async () => {
+        const result = await server.executeOperation(
+          {
+            query: RETURN_BOOK_MUTATION,
+            variables: { bookId: '   ' },
+          },
+          {
+            contextValue: context,
+          }
+        );
+
+        expect(result.body.kind).toBe('single');
+        if (result.body.kind === 'single') {
+          expect(result.body.singleResult.errors).toBeDefined();
+          expect(result.body.singleResult.errors?.[0]?.extensions?.code).toBe('INVALID_ID_FORMAT');
+          expect(result.body.singleResult.errors?.[0]?.extensions?.field).toBe('bookId');
+        }
+      });
+    });
+  });
 });

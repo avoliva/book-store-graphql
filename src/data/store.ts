@@ -37,18 +37,4 @@ export interface Store<T extends Identifiable> {
    * @returns The updated record, or undefined if not found
    */
   update(id: string, updates: Partial<T>): T | undefined;
-
-  /**
-   * Deletes a record by ID
-   * @param id - The ID of the record to delete
-   * @returns true if deleted, false if not found
-   */
-  delete(id: string): boolean;
-
-  /**
-   * Checks if a record exists
-   * @param id - The ID of the record to check
-   * @returns true if exists, false otherwise
-   */
-  exists(id: string): boolean;
 }

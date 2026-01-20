@@ -63,22 +63,4 @@ export class MemoryStore<T extends Identifiable> implements Store<T> {
     this.data.set(id, updated);
     return updated;
   }
-
-  /**
-   * Deletes a record by ID
-   * @param id - The ID of the record to delete
-   * @returns true if deleted, false if not found
-   */
-  delete(id: string): boolean {
-    return this.data.delete(id);
-  }
-
-  /**
-   * Checks if a record exists
-   * @param id - The ID of the record to check
-   * @returns true if exists, false otherwise
-   */
-  exists(id: string): boolean {
-    return this.data.has(id);
-  }
 }
