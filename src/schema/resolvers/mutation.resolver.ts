@@ -1,8 +1,8 @@
 import { GraphQLContext } from '../../app/context';
 import { BookRecord } from '../../domain/models';
 import { validateId } from '../../domain/validation';
-import { createInvalidIdError } from '../../domain/errors';
-import { sanitizeId } from '../../utils/sanitization';
+import { createValidationError } from '../../domain/errors';
+import { normalizeId } from '../../utils/normalization';
 
 /**
  * Resolvers for Mutation operations
@@ -24,20 +24,20 @@ export const Mutation = {
     // Validate bookId
     const bookIdValidation = validateId(args.bookId);
     if (!bookIdValidation.valid) {
-      throw createInvalidIdError('bookId', args.bookId);
+      throw createValidationError('bookId', bookIdValidation.error || 'Invalid ID format');
     }
 
     // Validate personId
     const personIdValidation = validateId(args.personId);
     if (!personIdValidation.valid) {
-      throw createInvalidIdError('personId', args.personId);
+      throw createValidationError('personId', personIdValidation.error || 'Invalid ID format');
     }
 
-    // Sanitize inputs
-    const sanitizedBookId = sanitizeId(args.bookId);
-    const sanitizedPersonId = sanitizeId(args.personId);
+    // Normalize inputs (trim whitespace only)
+    const normalizedBookId = normalizeId(args.bookId);
+    const normalizedPersonId = normalizeId(args.personId);
 
-    return context.libraryService.checkOutBook(sanitizedBookId, sanitizedPersonId);
+    return context.libraryService.checkOutBook(normalizedBookId, normalizedPersonId);
   },
 
   /**
@@ -56,12 +56,12 @@ export const Mutation = {
     // Validate bookId
     const bookIdValidation = validateId(args.bookId);
     if (!bookIdValidation.valid) {
-      throw createInvalidIdError('bookId', args.bookId);
+      throw createValidationError('bookId', bookIdValidation.error || 'Invalid ID format');
     }
 
-    // Sanitize input
-    const sanitizedBookId = sanitizeId(args.bookId);
+    // Normalize input (trim whitespace only)
+    const normalizedBookId = normalizeId(args.bookId);
 
-    return context.libraryService.returnBook(sanitizedBookId);
+    return context.libraryService.returnBook(normalizedBookId);
   },
 };

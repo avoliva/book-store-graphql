@@ -41,18 +41,39 @@ The key design decision is lazy loading. When you query `getAllBooks`, it doesn'
 
 We also compute `isCheckedOut` from `checkedOutById` instead of storing both. This prevents data inconsistency bugs.
 
-### Input Validation
+### Input Validation and Normalization
 
 All user inputs are validated before processing:
 
 - **ID Format Validation**: IDs must be non-empty strings (1-100 characters) with no leading/trailing whitespace and no control characters
-- **Input Sanitization**: Inputs are sanitized to remove dangerous characters and trim whitespace
 - **Early Validation**: Validation happens at the resolver level before calling the service layer, providing clear error messages
 
 Validation errors return `GraphQLError` with error codes:
-- `INVALID_ID_FORMAT` - Invalid ID format (empty, whitespace-only, or contains invalid characters)
-- `VALIDATION_ERROR` - Generic validation error
+- `VALIDATION_ERROR` - Validation error with specific error message from validation utilities
 - `INVALID_STRING_LENGTH` - String length outside allowed range
+
+#### Normalization Policy
+
+The system uses a "Forgiving" normalization policy for IDs:
+
+- **Step 1: Normalize**: Trim leading and trailing whitespace
+- **Step 2: Validate**: Check format (non-empty, length 1-100, no control characters)
+- **No Character Removal**: Special characters are NOT removed - invalid characters cause validation errors
+
+**Examples:**
+- Input: `"  book123  "` → Normalized: `"book123"` → Valid
+- Input: `"book#123"` → Normalized: `"book#123"` → Passes validation (validation doesn't reject `#`), but may fail at lookup if book doesn't exist
+
+This policy prevents silent ID transformation that could cause incorrect record lookups. Normalization is for robustness (log safety, trimming whitespace) rather than security.
+
+#### Layering Rule
+
+Resolvers follow a consistent layering pattern:
+
+- **Queries**: May read directly from stores (`context.bookStore.get()`, `context.personStore.get()`)
+- **Mutations**: Must go through service layer (`context.libraryService.checkOutBook()`, `context.libraryService.returnBook()`)
+
+This ensures business logic is centralized in the service layer while allowing queries to be efficient.
 
 ## Example Queries
 

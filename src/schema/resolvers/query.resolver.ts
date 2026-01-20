@@ -1,9 +1,8 @@
 import { GraphQLContext } from '../../app/context';
 import { BookRecord } from '../../domain/models';
-import { createBookNotFoundError } from '../../domain/errors';
+import { createBookNotFoundError, createValidationError } from '../../domain/errors';
 import { validateId } from '../../domain/validation';
-import { createInvalidIdError } from '../../domain/errors';
-import { sanitizeId } from '../../utils/sanitization';
+import { normalizeId } from '../../utils/normalization';
 
 /**
  * Resolvers for Query operations
@@ -46,22 +45,22 @@ export const Query = {
     // Validate bookId
     const bookIdValidation = validateId(args.bookId);
     if (!bookIdValidation.valid) {
-      throw createInvalidIdError('bookId', args.bookId);
+      throw createValidationError('bookId', bookIdValidation.error || 'Invalid ID format');
     }
 
-    // Sanitize input
-    const sanitizedBookId = sanitizeId(args.bookId);
+    // Normalize input (trim whitespace only)
+    const normalizedBookId = normalizeId(args.bookId);
 
     context.logger.debug(`getBookForId query executed`, {
-      bookId: sanitizedBookId,
+      bookId: normalizedBookId,
       timestamp: new Date().toISOString(),
     });
-    const book = context.bookStore.get(sanitizedBookId);
+    const book = context.bookStore.get(normalizedBookId);
     if (!book) {
-      context.logger.debug(`Book ${sanitizedBookId} not found`);
-      throw createBookNotFoundError(sanitizedBookId);
+      context.logger.debug(`Book ${normalizedBookId} not found`);
+      throw createBookNotFoundError(normalizedBookId);
     }
-    context.logger.debug(`Book ${sanitizedBookId} found: ${book.title}`);
+    context.logger.debug(`Book ${normalizedBookId} found: ${book.title}`);
     return book;
   },
 };
