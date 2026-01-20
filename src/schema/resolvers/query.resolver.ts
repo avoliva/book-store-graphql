@@ -38,7 +38,7 @@ export const Query = {
     return book;
   },
 
-  getPersons(
+  getAllPersons(
     _parent: unknown,
     _args: Record<string, never>,
     context: GraphQLContext
