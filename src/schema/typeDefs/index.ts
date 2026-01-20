@@ -15,6 +15,7 @@ const personTypeDef = /* GraphQL */ `
     lastName: String!
     emailAddress: String!
     phoneNumber: String
+    checkedOutBooks: [Book!]
   }
 `;
 
@@ -22,6 +23,7 @@ const queryTypeDef = /* GraphQL */ `
   type Query {
     getAllBooks: [Book!]!
     getBookForId(bookId: ID!): Book!
+    getAllPersons: [Person!]!
   }
 `;
 
