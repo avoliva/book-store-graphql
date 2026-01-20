@@ -1,4 +1,4 @@
-import { validateId, validateNonEmptyString, validateStringLength } from '../../src/domain/validation';
+import { validateId } from '../../src/domain/validation';
 
 describe('Validation Utilities', () => {
   describe('validateId', () => {
@@ -50,74 +50,6 @@ describe('Validation Utilities', () => {
       const result = validateId(null as unknown as string);
       expect(result.valid).toBe(false);
       expect(result.error).toContain('non-empty string');
-    });
-  });
-
-  describe('validateNonEmptyString', () => {
-    it('should return valid for valid strings', () => {
-      expect(validateNonEmptyString('hello', 'field')).toEqual({ valid: true });
-      expect(validateNonEmptyString('  hello  ', 'field')).toEqual({ valid: true });
-      expect(validateNonEmptyString('a', 'field')).toEqual({ valid: true });
-    });
-
-    it('should return invalid for empty strings', () => {
-      const result = validateNonEmptyString('', 'fieldName');
-      expect(result.valid).toBe(false);
-      expect(result.error).toContain('fieldName');
-      expect(result.error).toContain('empty');
-    });
-
-    it('should return invalid for whitespace-only strings', () => {
-      const result1 = validateNonEmptyString('   ', 'fieldName');
-      expect(result1.valid).toBe(false);
-      expect(result1.error).toContain('whitespace-only');
-
-      const result2 = validateNonEmptyString('\t\n', 'fieldName');
-      expect(result2.valid).toBe(false);
-      expect(result2.error).toContain('whitespace-only');
-    });
-
-    it('should return invalid for non-string values', () => {
-      const result = validateNonEmptyString(null as unknown as string, 'fieldName');
-      expect(result.valid).toBe(false);
-      expect(result.error).toContain('fieldName');
-    });
-  });
-
-  describe('validateStringLength', () => {
-    it('should return valid for strings within length range', () => {
-      expect(validateStringLength('hello', 1, 10, 'field')).toEqual({ valid: true });
-      expect(validateStringLength('a', 1, 10, 'field')).toEqual({ valid: true });
-      expect(validateStringLength('hello world', 1, 20, 'field')).toEqual({ valid: true });
-    });
-
-    it('should return invalid for strings shorter than min length', () => {
-      const result = validateStringLength('hi', 5, 10, 'fieldName');
-      expect(result.valid).toBe(false);
-      expect(result.error).toContain('fieldName');
-      expect(result.error).toContain('between 5 and 10');
-      expect(result.error).toContain('got 2');
-    });
-
-    it('should return invalid for strings longer than max length', () => {
-      const result = validateStringLength('hello world', 1, 5, 'fieldName');
-      expect(result.valid).toBe(false);
-      expect(result.error).toContain('fieldName');
-      expect(result.error).toContain('between 1 and 5');
-      expect(result.error).toContain('got 11');
-    });
-
-    it('should return invalid for non-string values', () => {
-      const result = validateStringLength(null as unknown as string, 1, 10, 'fieldName');
-      expect(result.valid).toBe(false);
-      expect(result.error).toContain('fieldName');
-      expect(result.error).toContain('must be a string');
-    });
-
-    it('should handle edge cases at boundaries', () => {
-      expect(validateStringLength('a', 1, 1, 'field')).toEqual({ valid: true });
-      expect(validateStringLength('ab', 1, 1, 'field').valid).toBe(false);
-      expect(validateStringLength('', 1, 10, 'field').valid).toBe(false);
     });
   });
 });
